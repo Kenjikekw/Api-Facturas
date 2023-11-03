@@ -1,7 +1,7 @@
 namespace Api.Models
 
 {
-    class Factura
+    public class Factura
     {
         public int id { get; set; }
         public DateTime fecha { get; set; }

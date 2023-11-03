@@ -9,6 +9,6 @@ namespace Api.Models
         {
 
          }
-         DbSet<Factura> Facturas {get;set;} = null!;
+         public DbSet<Factura> Facturas {get;set;} = null!;
     }
 }
