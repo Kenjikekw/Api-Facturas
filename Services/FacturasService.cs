@@ -18,10 +18,12 @@ namespace Api.Services
             return factura;
         }
 
-        public Task<Factura> DeleteFactura(int Id)
+        public async Task<Factura> DeleteFactura(int Id)
         {
-                        throw new NotImplementedException();
-
+         var factura = await _context.Facturas.FirstOrDefaultAsync(r=>r.id==Id);
+         _context.Facturas.Remove(factura);
+         await _context.SaveChangesAsync();
+         return factura;
         }
 
         public async Task<Factura> EditFactura(Factura factura)
@@ -37,9 +39,10 @@ namespace Api.Services
           return factura;
         }
 
-        public Task<Factura> GetFactura(int Id)
+        public async Task<Factura> GetFactura(int Id)
         {
-            throw new NotImplementedException();
+         var factura = await _context.Facturas.FirstOrDefaultAsync(f => f.id == Id);
+         return factura ?? null;
         }
     }
 
