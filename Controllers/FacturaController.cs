@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class FacturaController : ControllerBase
     {
         private readonly IFacturasService _facturasService;
