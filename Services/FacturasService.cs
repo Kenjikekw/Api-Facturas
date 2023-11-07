@@ -21,6 +21,10 @@ namespace Api.Services
         public async Task<Factura> DeleteFactura(int Id)
         {
          var factura = await _context.Facturas.FirstOrDefaultAsync(r=>r.id==Id);
+         if(factura==null){
+            return null;
+         }
+    
          _context.Facturas.Remove(factura);
          await _context.SaveChangesAsync();
          return factura;

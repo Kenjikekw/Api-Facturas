@@ -17,7 +17,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Factura>> GetAllFacturas()
+        public ActionResult<List<Factura>> GetFacturas()
         {
             var facturas = _facturasService.GetAllFactura();
             if(!facturas.Any()){
@@ -25,7 +25,42 @@ namespace Api.Controllers
             }
             return Ok(facturas);
         }
+        
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Factura>> GetFacturaById(int id){
+            
+            var facturas = await _facturasService.GetFactura(id);
+             if(facturas==null){
+                return NotFound("No se encontro la factura");
+            }
+            return Ok(facturas);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Factura>> DeleteFacturaById(int id){
+
+            var facturas = await _facturasService.DeleteFactura(id);
+             if(facturas==null){
+                return NotFound("No se encontro la factura");
+            }
+            return Ok(facturas);
+
+        }
+
+        [HttpPost] 
+        public async Task<ActionResult<Factura>> CreateNewFactura([FromBody] Factura factura){
+
+            var facturas = await _facturasService.CreateFactura(factura);
+            return Ok(facturas);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<Factura>> EditFactura(Factura factura){
+
+            var facturas = await _facturasService.EditFactura(factura);
+            return Ok(facturas);
+        }
+    }   
 
 
-    }
 }
