@@ -1,83 +1,124 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Facturas.aspx.cs" Inherits="Facturas" Async="true" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Facturas.aspx.cs" Inherits="TuNamespace.Facturas" Async="true" %>
 
 <!DOCTYPE html>
 
-    <html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<title></title>
-<style>
-    /* Estilo para el cuerpo de la página */
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-    }
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Facturas</title>
+    <link rel="stylesheet" type="text/css" href="facturas.css" />
 
-    /* Estilo para el formulario */
-    form {
-        margin: 20px;
-        padding: 20px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    /* Estilo para el DropDownList */
-    #DropDownList1 {
-        padding: 5px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-    }
-
-    /* Estilo para el GridView */
-    #GridView1 {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
-    }
-
-    /* Estilo para las celdas del GridView */
-    #GridView1 td, #GridView1 th {
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ccc;
-    }
-
-    /* Estilo para los TextBox */
-    input[type="text"] {
-        width: 100%;
-        padding: 5px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-    }
-
-    /* Estilo para los botones */
-    .button-container {
-        display: flex;
-        justify-content: space-evenly;
-        margin-top: 20px;
-    }
-
-</style>
 </head>
 <body>
-<form id="form1" runat="server">
-    <div>
-        <h2>Facturas</h2>
-        <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke">
-        </asp:GridView>
-        <div id="divs" runat="server">
-            
+    <form id="form1" runat="server">
+        <div>
+            <!-- Dropdowns y Botón POST -->
+            <div>
+                <asp:DropDownList ID="DropDownList1" runat="server">
+                    <!-- Agrega opciones al primer dropdown -->
+                </asp:DropDownList>
+
+                <asp:DropDownList ID="DropDownList2" runat="server">
+                    <!-- Agrega opciones al segundo dropdown -->
+                </asp:DropDownList>
+
+                <asp:Button ID="btnPost" runat="server" Text="POST" OnClick="btnPost_Click" />
+            </div>
+
+            <!-- Tabla de Facturas con botones CRUD -->
+            <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" OnRowDeleting="GridView1_RowDeleting">
+                <Columns>
+                    <asp:BoundField DataField="id" HeaderText="ID" SortExpression="id" />
+                    <asp:BoundField DataField="fecha" HeaderText="Fecha" SortExpression="fecha" />
+                    <asp:BoundField DataField="cif" HeaderText="CIF" SortExpression="cif" />
+                    <asp:BoundField DataField="nombre" HeaderText="Nombre" SortExpression="nombre" />
+                    <asp:BoundField DataField="importe" HeaderText="Importe" SortExpression="importe" />
+                    <asp:BoundField DataField="importe_iva" HeaderText="Importe IVA" SortExpression="importe_iva" />
+                    <asp:BoundField DataField="moneda" HeaderText="Moneda" SortExpression="moneda" />
+                    <asp:BoundField DataField="fecha_cobro" HeaderText="Fecha Cobro" SortExpression="fecha_cobro" />
+                    <asp:BoundField DataField="estado" HeaderText="Estado" SortExpression="estado" />
+                    <asp:CommandField ShowDeleteButton="True" />
+                </Columns>
+            </asp:GridView>
+
+            <!-- Formulario para agregar nueva factura -->
+            <div id="nuevaFacturaForm">
+                <h2>Agregar Nueva Factura</h2>
+
+                <table>
+                    <tr>
+                        <td>
+                            <label for="txtFecha">Fecha:</label>
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txtFecha" runat="server" placeholder="Fecha" TextMode="Date"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="txtCIF">CIF:</label>
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txtCIF" runat="server" placeholder="CIF"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="txtNombre">Nombre:</label>
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txtNombre" runat="server" placeholder="Nombre"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="txtImporte">Importe:</label>
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txtImporte" runat="server" placeholder="Importe" TextMode="Number"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="txtImporteIVA">Importe IVA:</label>
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txtImporteIVA" runat="server" placeholder="Importe IVA" TextMode="Number"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="ddlMoneda">Moneda:</label>
+                        </td>
+                        <td>
+                            <asp:DropDownList ID="ddlMoneda" runat="server">
+                                <!-- Agrega opciones para la moneda -->
+                            </asp:DropDownList>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="txtFechaCobro">Fecha de Cobro:</label>
+                        </td>
+                        <td>
+                            <asp:TextBox ID="txtFechaCobro" runat="server" placeholder="Fecha de Cobro" TextMode="Date"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="chkEstado">Estado:</label>
+                        </td>
+                        <td>
+                            <asp:CheckBox ID="chkEstado" runat="server" />
+                        </td>
+                    </tr>
+                </table>
+
+                <asp:Button ID="Button1" runat="server" Text="Agregar" OnClick="btnAgregar_Click" />
+            </div>
+
+        
         </div>
-        <div class="button-container" id="botones" runat="server" visible="false" >
-            <asp:Button runat="server" Text="Get" OnClick="Get" Enabled="false" ID="B_Get"/>
-            <asp:Button runat="server" Text="Post" OnClick="Post" Enabled="false" ID="B_Post"/>
-            <asp:Button runat="server" Text="Put" OnClick="Put" Enabled="false" ID="B_Put"/>
-            <asp:Button runat="server" Text="Delete" OnClick="Delete" Enabled="false" ID="B_Delete"/>
-        </div>
-    </div>
-</form>
+    </form>
 </body>
 </html>
