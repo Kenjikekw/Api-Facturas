@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+
+      #overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+      }
+
+      #popup {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(9, 9, 9, 0.524);
+        position: relative;
+      }
+      
+
+      
+    </style>
+    <script>
+      function closePopup() {
+        document.getElementById("overlay").style.display = "none";
+      }
+
+      function confirmDelete() {
+        closePopup();
+      }
+    </script>
+  </head>
+  <body>
+    <div id="popup">
+      
+      <p>¿Está seguro de que desea eliminar los datos?</p>
+      <button onclick="confirmDelete()">Aceptar</button>
+      <button onclick="closePopup()">Cancelar</button>
+    </div>
+  </body>
+</html>

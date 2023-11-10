@@ -20,50 +20,15 @@ public partial class Facturas : System.Web.UI.Page
             GridView1.DataSource = await Listar();
             GridView1.DataBind();
         }
-        CreacionComponentes(await Listar());
+        
     }
 
-    /* Pre: Por cada columna de la tabla te crea un textbox y un h4
+    /* Pre: Carga datos tabla
 	 * Pro: Lo hace
 	 * 
 	 * ORG 25/10/2023
 	 */
-    protected void CreacionComponentes(DataTable datos)
-    {
-        if (datos.Rows.Count > 0)
-        {
-            var divContainer = new HtmlGenericControl("div");
-            divContainer.ID = "divs2";
-            int id = 1;
-            foreach (DataColumn column in datos.Columns)
-            {
-                var h4 = new HtmlGenericControl("h4");
-                h4.InnerText = column.ColumnName;
-
-                var textBox = new TextBox();
-
-                textBox.ID = "Textbox" + id;
-                textBox.TextChanged += Vacio;
-                textBox.AutoPostBack = true;
-                id++;
-
-                divContainer.Controls.Add(h4);
-                divContainer.Controls.Add(textBox);
-            }
-            divs.Controls.Add(divContainer);
-            botones.Visible = true;
-        }
-        else
-        {
-            botones.Visible = false;
-        }
-    }
-
-    /* Pre: Hace una petición a la api y te transforma los datos en una tabla
-	 * Pro: Lo hace
-	 * 
-	 * ORG 25/10/2023
-	 */
+    
     public async Task<DataTable> Listar()
     {
 
@@ -112,47 +77,34 @@ public partial class Facturas : System.Web.UI.Page
 	 */
     protected void Vacio(object sender, EventArgs e)
     {
-        TextBox TextBox1 = (TextBox)divs.FindControl("TextBox1");
-        if (!string.IsNullOrWhiteSpace(TextBox1.Text) && int.TryParse(TextBox1.Text, out int numericValue))
-        {
-            B_Get.Enabled = true;
-            B_Delete.Enabled = true;
+        bool enableButton = true;
+        B_Agregar.Enabled = enableButton;
+     
+
+        if (string.IsNullOrEmpty(txtFecha.Text)||(string.IsNullOrEmpty(ddlMoneda.SelectedValue)||(string.IsNullOrEmpty(txtCIF.Text)||(string.IsNullOrEmpty(txtNombre.Text)|| (string.IsNullOrEmpty(txtImporte.Text)||(string.IsNullOrEmpty(txtImporteIVA.Text)||(string.IsNullOrEmpty(txtFechaCobro.Text))
+         {
+            B_Agregar.Enabled = false;
+            throw new Exception("Rellena todos los datos");
         }
         else
         {
-            B_Get.Enabled = false;
-            B_Delete.Enabled = false;
+            B_Agregar.Enabled = true;
         }
-        bool enableButton = true;
-        int id = 1;
-        foreach (DataColumn a in datatable.Columns)
-        {
-            TextBox textBox = (TextBox)divs.FindControl("TextBox" + id);
-            id++;
-            if (string.IsNullOrWhiteSpace(textBox.Text))
-            {
-                enableButton = false;
-                break;
-            }
-        }
-        B_Post.Enabled = enableButton;
-        B_Put.Enabled = enableButton;
-    }*/
-    /* Pre: Aplica los filtros al selecioanr dato de lso gridview
+        
+           
+    }
+    /* Pre: Bloquea boton agregar si hay datos
     * Pro: Lo hace
     * 
     * ORG 25/10/2023
     */
     protected void AplicarFiltros(object sender, EventArgs e)
     {
-        // Lee el archivo XML
-        DataSet ds = new DataSet();
-        ds.ReadXml(Server.MapPath("~/App_Data/Facturas_inicial.xml"));
-
-        // Crear un DataView desde el DataSet
-        DataView dataView = new DataView(ds.Tables[0]);
+       
+        DataView dataView = new DataView(datatable);
 
         // Obtener los valores de los DropDown
+
         string filtroMoneda = FiltroMoneda.SelectedValue;
         string filtroMetodoEnvio = FiltroEnvio.SelectedValue;
 
@@ -169,24 +121,11 @@ public partial class Facturas : System.Web.UI.Page
         {
             dataView.RowFilter = $"MetodoEnvio = '{filtroMetodoEnvio}'";
         }
-
-        // Guardar el DataView en la sesión
         Session["Filtro"] = dataView;
 
-        // Enlazar el DataView al GridView
-        TablaFacturas.DataSource = dataView;
-        TablaFacturas.DataBind();
+        GridView1.DataSource =  dataView;
+        GridView1.DataBind();
     }
-
-
-
-
-
-
-
-
-
-
 
     /* Pre: Hace una peticion a la api de tipo post con los datos introducidos en los textbox
 	 * Pro: Lo hace
@@ -247,10 +186,12 @@ public partial class Facturas : System.Web.UI.Page
     * Pro: Lo hace
     * 
     * ORG 25/10/2023
-    */
+  
     protected async void Get(object sender, EventArgs e)
     {
-        TextBox TextBox1 = (TextBox)divs.FindControl("TextBox1");
+        TextBox TextBox1 = (TextBox)
+           
+            divs.FindControl("TextBox1");
         using (HttpClient client = new HttpClient())
         {
             HttpResponseMessage response = await client.GetAsync($"https://facturass.azurewebsites.net/factura");
@@ -263,22 +204,8 @@ public partial class Facturas : System.Web.UI.Page
                 DataTable dataTable = new DataTable();
 
                 if (jsonObject != null)
-                {
-                    foreach (JProperty prop in jsonObject.Properties())
-                    {
-                        dataTable.Columns.Add(prop.Name.ToUpper());
-                    }
-
-                    DataRow fila = dataTable.NewRow();
-
-                    foreach (JProperty prop in jsonObject.Properties())
-                    {
-                        fila[prop.Name] = prop.Value.ToString();
-                    }
-                    dataTable.Rows.Add(fila);
-
-                    GridView1.DataSource = dataTable;
-                    GridView1.DataBind();
+                {n 
+                    
                 }
             }
             else
@@ -287,7 +214,8 @@ public partial class Facturas : System.Web.UI.Page
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
             }
         }
-    }
+    }*/
+   
     /* Pre: Hace una peticion a la api de tipo delete con el dato introducido en el textbox
     * Pro: Lo hace
     * 
@@ -306,6 +234,7 @@ public partial class Facturas : System.Web.UI.Page
             {
                 GridView1.DataSource = await Listar();
                 GridView1.DataBind();
+                GridView1.Rows[GridView1.SelectedRow()].Cells[0].ToString();
             }
             else
             {

@@ -26,7 +26,7 @@
                
             </div>
 
-            <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" OnRowDeleting="GridView1_RowDeleting">
+            <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" OnRowDeleting="GridView1_RowDeleting" AutoGenerateColumns="false">
                 <Columns>
                     <asp:BoundField DataField="id" HeaderText="ID" SortExpression="id" />
                     <asp:BoundField DataField="fecha" HeaderText="Fecha" SortExpression="fecha" />
@@ -112,7 +112,7 @@
                     </tr>
                 </table>
 
-                <asp:Button ID="Button1" runat="server" Text="Agregar" OnClick="btnAgregar_Click" />
+                <asp:Button ID="B_Agregar" runat="server" Text="Agregar" OnClick="btnAgregar_Click" />
             </div>
 
         
