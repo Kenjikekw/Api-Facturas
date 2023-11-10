@@ -1,4 +1,6 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Facturas.aspx.cs" Inherits="TuNamespace.Facturas" Async="true" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Facturas.aspx.cs" Inherits="Facturas" Async="true" %>
+
+
 
 <!DOCTYPE html>
 
@@ -12,20 +14,18 @@
 <body>
     <form id="form1" runat="server">
         <div>
-            <!-- Dropdowns y Botón POST -->
             <div>
-                <asp:DropDownList ID="DropDownList1" runat="server">
-                    <!-- Agrega opciones al primer dropdown -->
+                <asp:DropDownList ID="FiltroMoneda" runat="server" OnSelectedIndexChanged="AplicarFiltros">
+                    
                 </asp:DropDownList>
 
-                <asp:DropDownList ID="DropDownList2" runat="server">
-                    <!-- Agrega opciones al segundo dropdown -->
+                <asp:DropDownList ID="FiltroEnvio" runat="server" OnSelectedIndexChanged="AplicarFiltros">
+                    
                 </asp:DropDownList>
 
-                <asp:Button ID="btnPost" runat="server" Text="POST" OnClick="btnPost_Click" />
+               
             </div>
 
-            <!-- Tabla de Facturas con botones CRUD -->
             <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" OnRowDeleting="GridView1_RowDeleting">
                 <Columns>
                     <asp:BoundField DataField="id" HeaderText="ID" SortExpression="id" />
@@ -41,7 +41,6 @@
                 </Columns>
             </asp:GridView>
 
-            <!-- Formulario para agregar nueva factura -->
             <div id="nuevaFacturaForm">
                 <h2>Agregar Nueva Factura</h2>
 
@@ -92,7 +91,6 @@
                         </td>
                         <td>
                             <asp:DropDownList ID="ddlMoneda" runat="server">
-                                <!-- Agrega opciones para la moneda -->
                             </asp:DropDownList>
                         </td>
                     </tr>

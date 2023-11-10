@@ -137,7 +137,56 @@ public partial class Facturas : System.Web.UI.Page
         }
         B_Post.Enabled = enableButton;
         B_Put.Enabled = enableButton;
+    }*/
+    /* Pre: Aplica los filtros al selecioanr dato de lso gridview
+    * Pro: Lo hace
+    * 
+    * ORG 25/10/2023
+    */
+    protected void AplicarFiltros(object sender, EventArgs e)
+    {
+        // Lee el archivo XML
+        DataSet ds = new DataSet();
+        ds.ReadXml(Server.MapPath("~/App_Data/Facturas_inicial.xml"));
+
+        // Crear un DataView desde el DataSet
+        DataView dataView = new DataView(ds.Tables[0]);
+
+        // Obtener los valores de los DropDown
+        string filtroMoneda = FiltroMoneda.SelectedValue;
+        string filtroMetodoEnvio = FiltroEnvio.SelectedValue;
+
+        // Aplicar filtros
+        if (filtroMoneda != "Todos" && filtroMetodoEnvio != "Todos")
+        {
+            dataView.RowFilter = $"Moneda = '{filtroMoneda}' AND MetodoEnvio = '{filtroMetodoEnvio}'";
+        }
+        else if (filtroMoneda != "Todos")
+        {
+            dataView.RowFilter = $"Moneda = '{filtroMoneda}'";
+        }
+        else if (filtroMetodoEnvio != "Todos")
+        {
+            dataView.RowFilter = $"MetodoEnvio = '{filtroMetodoEnvio}'";
+        }
+
+        // Guardar el DataView en la sesión
+        Session["Filtro"] = dataView;
+
+        // Enlazar el DataView al GridView
+        TablaFacturas.DataSource = dataView;
+        TablaFacturas.DataBind();
     }
+
+
+
+
+
+
+
+
+
+
 
     /* Pre: Hace una peticion a la api de tipo post con los datos introducidos en los textbox
 	 * Pro: Lo hace
