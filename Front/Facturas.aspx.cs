@@ -213,11 +213,11 @@ public partial class Facturas : System.Web.UI.Page
     * 
     * ORG 25/10/2023
     */
-    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    protected void Eliminar()
     {
-        if (e.RowIndex >= 0)
+        if (GridView1.SelectedIndex >= 0)
         {
-            int rowIndex = e.RowIndex;
+            int rowIndex = GridView1.SelectedIndex;
             string idToDelete = GridView1.DataKeys[rowIndex]["id"].ToString();
 
             ViewState["IDToDelete"] = idToDelete;
@@ -227,9 +227,8 @@ public partial class Facturas : System.Web.UI.Page
 
     protected void btnConfirmarEliminar_Click(object sender, EventArgs e)
     {
-        string idToDelete = ViewState["IDToDelete"].ToString();
-
-        Delete(idToDelete);
+       
+        Delete(ViewState["IDToDelete"].ToString());
 
         confirmationPanel.Style["display"] = "none";
     }
@@ -322,8 +321,23 @@ public partial class Facturas : System.Web.UI.Page
         }
     }
 
-    protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
-    {
 
+
+    protected void Editar()
+    {
+        nuevaFacturaForm.Style["display"] = "block";
     }
+
+    protected void Command(object sender, GridViewCommandEventArgs e,DataGridItem d)
+    {
+        if (e.CommandName.Equals("Editar"))
+        {
+            Editar();
+        }
+        else if (e.CommandName.Equals("Eliminar"))
+        {
+            Eliminar();
+        }
+    }
+
 }
