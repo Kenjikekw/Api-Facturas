@@ -20,7 +20,7 @@ public partial class Facturas : System.Web.UI.Page
             GridView1.DataSource = await Listar();
             GridView1.DataBind();
         }
-        
+
     }
 
     /* Pre: Carga datos tabla
@@ -28,13 +28,12 @@ public partial class Facturas : System.Web.UI.Page
 	 * 
 	 * ORG 25/10/2023
 	 */
-    
+
     public async Task<DataTable> Listar()
     {
-
         using (HttpClient client = new HttpClient())
         {
-            HttpResponseMessage response = await client.GetAsync($"https://facturass.azurewebsites.net/factura");
+            HttpResponseMessage response = await client.GetAsync("https://facturass.azurewebsites.net/factura");
 
             if (response.IsSuccessStatusCode)
             {
@@ -46,10 +45,18 @@ public partial class Facturas : System.Web.UI.Page
 
                 if (jsonArray.Count > 0)
                 {
+                    // Assuming the first object in the array represents the structure
                     JObject firstObject = jsonArray.First() as JObject;
-                    for (int i = 0; i < firstObject.Properties().Count(); i++)
+                    HashSet<string> columnNames = new HashSet<string>();
+
+                    foreach (JProperty prop in firstObject.Properties())
                     {
-                        dataTable.Columns.Add(firstObject.Properties().ElementAt(i).Name.ToUpper(), typeof(string));
+                        columnNames.Add(prop.Name.ToUpper());
+                    }
+
+                    foreach (string columnName in columnNames)
+                    {
+                        dataTable.Columns.Add(columnName, typeof(string));
                     }
 
                     foreach (JObject jsonObj in jsonArray)
@@ -57,10 +64,12 @@ public partial class Facturas : System.Web.UI.Page
                         DataRow fila = dataTable.NewRow();
                         foreach (JProperty prop in jsonObj.Properties())
                         {
-                            fila[prop.Name] = prop.Value.ToString();
+                            fila[prop.Name.ToUpper()] = prop.Value.ToString();
                         }
                         dataTable.Rows.Add(fila);
                     }
+
+                    // Assuming datatable is a class-level variable
                     datatable = dataTable;
                     return dataTable;
                 }
@@ -79,13 +88,19 @@ public partial class Facturas : System.Web.UI.Page
     {
         bool enableButton = true;
         B_Agregar.Enabled = enableButton;
-     
 
-        if (string.IsNullOrEmpty(txtFecha.Text)||(string.IsNullOrEmpty(ddlMoneda.SelectedValue)||(string.IsNullOrEmpty(txtCIF.Text)||(string.IsNullOrEmpty(txtNombre.Text)|| (string.IsNullOrEmpty(txtImporte.Text)||(string.IsNullOrEmpty(txtImporteIVA.Text)||(string.IsNullOrEmpty(txtFechaCobro.Text))
-         {
+
+        if (string.IsNullOrEmpty(txtFecha.Text) ||
+            string.IsNullOrEmpty(ddlMoneda.SelectedValue) ||
+            string.IsNullOrEmpty(txtCIF.Text) ||
+            string.IsNullOrEmpty(txtNombre.Text) ||
+            string.IsNullOrEmpty(txtImporte.Text) ||
+            string.IsNullOrEmpty(txtImporteIVA.Text) ||
+            string.IsNullOrEmpty(txtFechaCobro.Text))
+        {
             B_Agregar.Enabled = false;
             throw new Exception("Rellena todos los datos");
-        }
+           }
         else
         {
             B_Agregar.Enabled = true;
@@ -97,18 +112,15 @@ public partial class Facturas : System.Web.UI.Page
     * Pro: Lo hace
     * 
     * ORG 25/10/2023
-    */
+    
+   
     protected void AplicarFiltros(object sender, EventArgs e)
     {
-       
         DataView dataView = new DataView(datatable);
-
-        // Obtener los valores de los DropDown
 
         string filtroMoneda = FiltroMoneda.SelectedValue;
         string filtroMetodoEnvio = FiltroEnvio.SelectedValue;
 
-        // Aplicar filtros
         if (filtroMoneda != "Todos" && filtroMetodoEnvio != "Todos")
         {
             dataView.RowFilter = $"Moneda = '{filtroMoneda}' AND MetodoEnvio = '{filtroMetodoEnvio}'";
@@ -123,9 +135,10 @@ public partial class Facturas : System.Web.UI.Page
         }
         Session["Filtro"] = dataView;
 
-        GridView1.DataSource =  dataView;
+        GridView1.DataSource = dataView;
         GridView1.DataBind();
     }
+
 
     /* Pre: Hace una peticion a la api de tipo post con los datos introducidos en los textbox
 	 * Pro: Lo hace
@@ -136,27 +149,34 @@ public partial class Facturas : System.Web.UI.Page
     {
         JObject jsonData = new JObject();
 
-        JProperty[] properties = datatable.Columns.Cast<DataColumn>()
-            .Skip(1)
-            .Select((column, index) =>
-            {
-                var textBox = FindControl("TextBox" + (index + 2)) as TextBox;
-                if (column.DataType == typeof(int))
+        // Recorre las filas de la tabla
+        foreach (GridViewRow row in GridView1.Rows)
+        {
+            var properties = row.Cells.Cast<DataControlFieldCell>()
+                .Select(cell =>
                 {
-                    return new JProperty(column.ColumnName.ToLower(), int.Parse(textBox.Text));
-                }
-                else if (column.DataType == typeof(bool))
-                {
-                    return new JProperty(column.ColumnName.ToLower(), bool.Parse(textBox.Text));
-                }
-                else
-                {
-                    return new JProperty(column.ColumnName.ToLower(), textBox.Text);
-                }
-            })
-            .ToArray();
+                    var textBox = cell.Controls.OfType<TextBox>().FirstOrDefault();
+                    var dropDownList = cell.Controls.OfType<DropDownList>().FirstOrDefault();
 
-        jsonData.Add(properties);
+                    if (textBox != null)
+                    {
+                        return new JProperty(textBox.ID.ToLower(), textBox.Text);
+                    }
+                    else if (dropDownList != null)
+                    {
+                        return new JProperty(dropDownList.ID.ToLower(), dropDownList.SelectedValue);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                })
+                .Where(property => property != null)
+                .ToArray();
+
+            jsonData.Add(properties);
+
+        }
 
         var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(jsonData);
 
@@ -186,63 +206,66 @@ public partial class Facturas : System.Web.UI.Page
     * Pro: Lo hace
     * 
     * ORG 25/10/2023
-  
-    protected async void Get(object sender, EventArgs e)
-    {
-        TextBox TextBox1 = (TextBox)
-           
-            divs.FindControl("TextBox1");
-        using (HttpClient client = new HttpClient())
-        {
-            HttpResponseMessage response = await client.GetAsync($"https://facturass.azurewebsites.net/factura");
+ 
 
-            if (response.IsSuccessStatusCode)
-            {
-                string data = await response.Content.ReadAsStringAsync();
-                JObject jsonObject = JObject.Parse(data);
-
-                DataTable dataTable = new DataTable();
-
-                if (jsonObject != null)
-                {n 
-                    
-                }
-            }
-            else
-            {
-                string script = $"alert('No existe el id {TextBox1.Text} en la base de datos');";
-                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-            }
-        }
-    }*/
-   
     /* Pre: Hace una peticion a la api de tipo delete con el dato introducido en el textbox
     * Pro: Lo hace
     * 
     * ORG 25/10/2023
     */
-    protected async void Delete(object sender, EventArgs e)
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
     {
-        TextBox TextBox1 = (TextBox)divs.FindControl("TextBox1");
+        if (e.RowIndex >= 0)
+        {
+            int rowIndex = e.RowIndex;
+            string idToDelete = GridView1.DataKeys[rowIndex]["id"].ToString();
 
+            ViewState["IDToDelete"] = idToDelete;
+            confirmationPanel.Style["display"] = "block";
+        }
+    }
+
+    protected void btnConfirmarEliminar_Click(object sender, EventArgs e)
+    {
+        string idToDelete = ViewState["IDToDelete"].ToString();
+
+        Delete(idToDelete);
+
+        confirmationPanel.Style["display"] = "none";
+    }
+    protected void btnCancelarEliminar_Click(object sender, EventArgs e)
+{
+    ScriptManager.RegisterStartupScript(this, GetType(), "HideConfirmationPanel", "$('#confirmationPanel').hide();", true);
+}
+
+
+    protected async void Delete(string idToDelete)
+    {
         using (HttpClient client = new HttpClient())
         {
-
-            HttpResponseMessage response = await client.DeleteAsync($"https://facturass.azurewebsites.net/factura");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                GridView1.DataSource = await Listar();
-                GridView1.DataBind();
-                GridView1.Rows[GridView1.SelectedRow()].Cells[0].ToString();
+                HttpResponseMessage response = await client.DeleteAsync($"https://facturass.azurewebsites.net/factura/{idToDelete}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    GridView1.DataSource = await Listar();
+                    GridView1.DataBind();
+                }
+                else
+                {
+                    string script = $"alert('Error al eliminar la factura con ID {idToDelete}');";
+                    ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                string script = $"alert('No existe el id {TextBox1.Text} en la base de datos ');";
+                string script = $"alert('Error: {ex.Message}');";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
             }
         }
     }
+
 
     /* Pre: Hace una peticion a la api de tipo put con los datos introducidos en los textbox
     * Pro: Lo hace
@@ -297,5 +320,10 @@ public partial class Facturas : System.Web.UI.Page
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
             }
         }
+    }
+
+    protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
     }
 }

@@ -1,7 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Facturas.aspx.cs" Inherits="Facturas" Async="true" %>
 
 
-
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -10,23 +9,21 @@
     <title>Facturas</title>
     <link rel="stylesheet" type="text/css" href="facturas.css" />
 
+    <script>
+        function cerrarPanel() {
+            var confirmationPanel = document.getElementById('<%= confirmationPanel.ClientID %>');
+            confirmationPanel.style.display = 'none';
+        }
+    </script>
+
 </head>
 <body>
     <form id="form1" runat="server">
         <div>
-            <div>
-                <asp:DropDownList ID="FiltroMoneda" runat="server" OnSelectedIndexChanged="AplicarFiltros">
-                    
-                </asp:DropDownList>
+            
+            
 
-                <asp:DropDownList ID="FiltroEnvio" runat="server" OnSelectedIndexChanged="AplicarFiltros">
-                    
-                </asp:DropDownList>
-
-               
-            </div>
-
-            <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" OnRowDeleting="GridView1_RowDeleting" AutoGenerateColumns="false">
+            <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" OnRowDeleting="GridView1_RowDeleting" AutoGenerateColumns="false" DataKeyNames="id" OnSelectedIndexChanged="GridView1_SelectedIndexChanged">
                 <Columns>
                     <asp:BoundField DataField="id" HeaderText="ID" SortExpression="id" />
                     <asp:BoundField DataField="fecha" HeaderText="Fecha" SortExpression="fecha" />
@@ -37,7 +34,8 @@
                     <asp:BoundField DataField="moneda" HeaderText="Moneda" SortExpression="moneda" />
                     <asp:BoundField DataField="fecha_cobro" HeaderText="Fecha Cobro" SortExpression="fecha_cobro" />
                     <asp:BoundField DataField="estado" HeaderText="Estado" SortExpression="estado" />
-                    <asp:CommandField ShowDeleteButton="True" />
+                    <asp:CommandField ShowDeleteButton="True" ButtonType="Button" DeleteText="Eliminar" />
+
                 </Columns>
             </asp:GridView>
 
@@ -112,10 +110,15 @@
                     </tr>
                 </table>
 
-                <asp:Button ID="B_Agregar" runat="server" Text="Agregar" OnClick="btnAgregar_Click" />
+               <asp:Button ID="B_Agregar" runat="server" Text="Agregar" OnClientClick="return Vacio();" OnClick="Post" />            
+
             </div>
 
-        
+            <div id="confirmationPanel" runat="server" class="confirmation-panel">
+            <p>¿Estás seguro de que deseas eliminar este elemento?</p>
+            <asp:Button ID="btnConfirmarEliminar" runat="server" Text="Aceptar" OnClick="btnConfirmarEliminar_Click" />
+            <asp:Button ID="btnCancelarEliminar" runat="server" Text="Cancelar" OnClientClick="cerrarPanel(); return false;" />
+            </div>
         </div>
     </form>
 </body>
