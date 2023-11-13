@@ -218,82 +218,84 @@ button {
             <div id="nuevaFacturaForm" runat="server">
                 <h2></h2>
 
-                <table>
-                    <tr>
-                        <td>
-                            <label for="txtFecha">Fecha:</label>
-                        </td>
-                        <td>
-                            <asp:TextBox ID="txtFecha" runat="server" placeholder="Fecha" TextMode="Date"></asp:TextBox>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="txtCIF">CIF:</label>
-                        </td>
-                        <td>
-                            <asp:TextBox ID="txtCIF" runat="server" placeholder="CIF"></asp:TextBox>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="txtNombre">Nombre:</label>
-                        </td>
-                        <td>
-                            <asp:TextBox ID="txtNombre" runat="server" placeholder="Nombre"></asp:TextBox>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="txtImporte">Importe:</label>
-                        </td>
-                        <td>
-                            <asp:TextBox ID="txtImporte" runat="server" placeholder="Importe" TextMode="Number"></asp:TextBox>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="txtImporteIVA">Importe IVA:</label>
-                        </td>
-                        <td>
-                            <asp:TextBox ID="txtImporteIVA" runat="server" placeholder="Importe IVA" TextMode="Number"></asp:TextBox>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="ddlMoneda">Moneda:</label>
-                        </td>
-                        <td>
-                            <asp:DropDownList ID="ddlMoneda" runat="server">
-                          
-                            </asp:DropDownList>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="txtFechaCobro">Fecha de Cobro:</label>
-                        </td>
-                        <td>
-                            <asp:TextBox ID="txtFechaCobro" runat="server" placeholder="Fecha de Cobro" TextMode="Date"></asp:TextBox>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for="chkEstado">Estado:</label>
-                        </td>
-                        <td>
-                            <asp:CheckBox ID="chkEstado" runat="server" />
-                        </td>
-                    </tr>
-                </table>
+                <div>
+                    <div>
+
+                        <h4 for="txtFecha">Fecha:</h4>
+
+
+                        <asp:TextBox ID="txtFecha" runat="server" placeholder="Fecha" TextMode="Date"></asp:TextBox>
+
+                    </div>
+                    <div>
+
+                        <h4 for="txtCIF">CIF:</h4>
+
+
+                        <asp:TextBox ID="txtCIF" runat="server" placeholder="CIF"></asp:TextBox>
+
+                    </div>
+                    <div>
+
+                        <h4 for="txtNombre">Nombre:</h4>
+
+
+                        <asp:TextBox ID="txtNombre" runat="server" placeholder="Nombre"></asp:TextBox>
+
+                    </div>
+                    <div>
+
+                        <h4 for="txtImporte">Importe:</h4>
+
+
+                        <asp:TextBox ID="txtImporte" runat="server" placeholder="Importe" TextMode="Number"></asp:TextBox>
+
+                    </div>
+                    <div>
+
+                        <h4 for="txtImporteIVA">Importe IVA:</h4>
+
+
+                        <asp:TextBox ID="txtImporteIVA" runat="server" placeholder="Importe IVA" TextMode="Number"></asp:TextBox>
+
+                    </div>
+                    <div>
+
+                        <h4 for="ddlMoneda">Moneda:</h4>
+
+
+                        <asp:DropDownList ID="ddlMoneda" runat="server">
+                        </asp:DropDownList>
+
+                    </div>
+                    <div>
+
+                        <h4 for="txtFechaCobro">Fecha de Cobro:</h4>
+
+
+                        <asp:TextBox ID="txtFechaCobro" runat="server" placeholder="Fecha de Cobro" TextMode="Date"></asp:TextBox>
+
+                    </div>
+                    <div>
+
+                        <h4 for="chkEstado">Estado:</h4>
+
+
+                        <asp:CheckBox ID="chkEstado" runat="server" />
+
+                    </div>
+                </div>
 
 
             </div>
 
             <div id="confirmationPanel" runat="server" class="confirmation-panel">
-            <p>¿Estás seguro de que deseas eliminar este elemento?</p>
-            <asp:Button ID="btnConfirmarEliminar" runat="server" Text="Aceptar" OnClick="btnConfirmarEliminar_Click" />
-            <asp:Button ID="btnCancelarEliminar" runat="server" Text="Cancelar" OnClientClick="" />
+                <p>¿Estás seguro de que deseas eliminar este elemento?</p>
+                <div>
+                    <asp:Button ID="btnConfirmarEliminar" runat="server" Text="Aceptar" OnClick="btnConfirmarEliminar_Click" />
+                    <asp:Button ID="btnCancelarEliminar" runat="server" Text="Cancelar" OnClientClick="" />
+                </div>
+
             </div>
         </div>
     </form>
