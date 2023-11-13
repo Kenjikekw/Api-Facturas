@@ -12,15 +12,24 @@ using System.Web.UI.HtmlControls;
 
 public partial class Facturas : System.Web.UI.Page
 {
-    private DataTable datatable = new DataTable();
     protected async void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
         {
-            GridView1.DataSource = await Listar();
-            GridView1.DataBind();
+            await Cargar();
         }
+    }
 
+    protected async void Cargar(object sender, EventArgs e)
+    {
+        await Cargar();
+    }
+
+
+    protected async Task Cargar()
+    {
+        GridView1.DataSource = await Listar();
+        GridView1.DataBind();
     }
 
     /* Pre: Carga datos tabla
@@ -43,36 +52,56 @@ public partial class Facturas : System.Web.UI.Page
 
                 DataTable dataTable = new DataTable();
 
-                if (jsonArray.Count > 0)
+                dataTable.Columns.Add("id", typeof(int));
+                dataTable.Columns.Add("fecha", typeof(DateTime));
+                dataTable.Columns.Add("cif", typeof(string));
+                dataTable.Columns.Add("nombre", typeof(string));
+                dataTable.Columns.Add("importe", typeof(decimal));
+                dataTable.Columns.Add("importe_iva", typeof(decimal));
+                dataTable.Columns.Add("moneda", typeof(string));
+                dataTable.Columns.Add("fecha_cobro", typeof(DateTime));
+                dataTable.Columns.Add("estado", typeof(string));
+
+                foreach(JObject a in jsonArray)
                 {
-                    // Assuming the first object in the array represents the structure
-                    JObject firstObject = jsonArray.First() as JObject;
-                    HashSet<string> columnNames = new HashSet<string>();
+                    DataRow newRow = dataTable.NewRow();
 
-                    foreach (JProperty prop in firstObject.Properties())
-                    {
-                        columnNames.Add(prop.Name.ToUpper());
-                    }
+                    newRow["id"] = a["id"].ToObject<int>();
+                    newRow["fecha"] = a["fecha"].ToObject<DateTime>();
+                    newRow["cif"] = a["cif"].ToObject<string>();
+                    newRow["nombre"] = a["nombre"].ToObject<string>();
+                    newRow["importe"] = a["importe"].ToObject<decimal>();
+                    newRow["importe_iva"] = a["importe_iva"].ToObject<decimal>();
+                    newRow["moneda"] = a["moneda"].ToObject<string>();
+                    newRow["fecha_cobro"] = a["fecha_cobro"].ToObject<DateTime>();
+                    newRow["estado"] = a["estado"].ToObject<bool>() ? "Pagada" : "No Pagada" ;
 
-                    foreach (string columnName in columnNames)
-                    {
-                        dataTable.Columns.Add(columnName, typeof(string));
-                    }
-
-                    foreach (JObject jsonObj in jsonArray)
-                    {
-                        DataRow fila = dataTable.NewRow();
-                        foreach (JProperty prop in jsonObj.Properties())
-                        {
-                            fila[prop.Name.ToUpper()] = prop.Value.ToString();
-                        }
-                        dataTable.Rows.Add(fila);
-                    }
-
-                    // Assuming datatable is a class-level variable
-                    datatable = dataTable;
-                    return dataTable;
+                    dataTable.Rows.Add(newRow);
                 }
+
+                //Aplicamos los filtros y mierdas
+                DataTable dataTableFiltrada = dataTable.Clone();
+                foreach (DataRow fila in dataTable.Rows)
+                {
+                    DateTime fecha = DateTime.Parse(fila["fecha"].ToString()); // Ajusta "Fecha" al nombre real de la columna
+                    string moneda = fila["moneda"].ToString(); // Ajusta "TipoMoneda" al nombre real de la columna
+                    string estadoFila = fila["Estado"].ToString(); // Ajusta "Estado" al nombre real de la columna
+                    decimal importe = decimal.Parse(fila["Importe"].ToString()); // Ajusta "Importe" al nombre real de la columna
+
+                    // Aplicar filtros
+                    if ((string.IsNullOrEmpty(f_desde.Text) || fecha >= DateTime.Parse(f_desde.Text))
+                        && (string.IsNullOrEmpty(f_hasta.Text) || fecha <= DateTime.Parse(f_hasta.Text))
+                        && (string.IsNullOrEmpty(f_moneda.SelectedValue) || moneda == f_moneda.SelectedValue)
+                        && (string.IsNullOrEmpty(f_estado.SelectedValue) || estadoFila == f_estado.SelectedValue)
+                        && (string.IsNullOrEmpty(f_importeMin.Text) || importe >= decimal.Parse(f_importeMin.Text))
+                        && (string.IsNullOrEmpty(f_importeMax.Text) || importe <= decimal.Parse(f_importeMax.Text)))
+                    {
+                        // Agregar la fila a la DataTable filtrada
+                        dataTableFiltrada.ImportRow(fila);
+                    }
+                }
+
+                return dataTableFiltrada;
             }
         }
 
@@ -100,13 +129,13 @@ public partial class Facturas : System.Web.UI.Page
         {
             B_Agregar.Enabled = false;
             throw new Exception("Rellena todos los datos");
-           }
+        }
         else
         {
             B_Agregar.Enabled = true;
         }
-        
-           
+
+
     }
     /* Pre: Bloquea boton agregar si hay datos
     * Pro: Lo hace
@@ -145,40 +174,11 @@ public partial class Facturas : System.Web.UI.Page
 	 * 
 	 * ORG 25/10/2023
 	 */
-    protected async void Post(object sender, EventArgs e)
+    protected async void Post(JObject factura)
     {
-        JObject jsonData = new JObject();
+        
 
-        // Recorre las filas de la tabla
-        foreach (GridViewRow row in GridView1.Rows)
-        {
-            var properties = row.Cells.Cast<DataControlFieldCell>()
-                .Select(cell =>
-                {
-                    var textBox = cell.Controls.OfType<TextBox>().FirstOrDefault();
-                    var dropDownList = cell.Controls.OfType<DropDownList>().FirstOrDefault();
-
-                    if (textBox != null)
-                    {
-                        return new JProperty(textBox.ID.ToLower(), textBox.Text);
-                    }
-                    else if (dropDownList != null)
-                    {
-                        return new JProperty(dropDownList.ID.ToLower(), dropDownList.SelectedValue);
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                })
-                .Where(property => property != null)
-                .ToArray();
-
-            jsonData.Add(properties);
-
-        }
-
-        var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(jsonData);
+        var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(factura);
 
         using (HttpClient client = new HttpClient())
         {
@@ -213,7 +213,7 @@ public partial class Facturas : System.Web.UI.Page
     * 
     * ORG 25/10/2023
     */
-    protected void Eliminar()
+    protected void Eliminar(object sender, EventArgs e)
     {
         if (GridView1.SelectedIndex >= 0)
         {
@@ -225,20 +225,11 @@ public partial class Facturas : System.Web.UI.Page
         }
     }
 
-    protected void btnConfirmarEliminar_Click(object sender, EventArgs e)
-    {
-       
-        Delete(ViewState["IDToDelete"].ToString());
 
-        confirmationPanel.Style["display"] = "none";
-    }
-    protected void btnCancelarEliminar_Click(object sender, EventArgs e)
-{
-    ScriptManager.RegisterStartupScript(this, GetType(), "HideConfirmationPanel", "$('#confirmationPanel').hide();", true);
-}
+ 
 
 
-    protected async void Delete(string idToDelete)
+    protected async Task Delete(string idToDelete)
     {
         using (HttpClient client = new HttpClient())
         {
@@ -271,32 +262,10 @@ public partial class Facturas : System.Web.UI.Page
     * 
     * ORG 25/10/2023
     */
-    protected async void Put(object sender, EventArgs e)
+    protected async void Put(JObject factura)
     {
-        JObject jsonData = new JObject();
 
-        JProperty[] properties = datatable.Columns.Cast<DataColumn>()
-            .Select((column, index) =>
-            {
-                var textBox = FindControl("TextBox" + (index + 1)) as TextBox;
-                if (column.DataType == typeof(int))
-                {
-                    return new JProperty(column.ColumnName.ToLower(), int.Parse(textBox.Text));
-                }
-                else if (column.DataType == typeof(bool))
-                {
-                    return new JProperty(column.ColumnName.ToLower(), bool.Parse(textBox.Text));
-                }
-                else
-                {
-                    return new JProperty(column.ColumnName.ToLower(), textBox.Text);
-                }
-            })
-            .ToArray();
-
-        jsonData.Add(properties);
-
-        var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(jsonData);
+        var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(factura);
 
         using (HttpClient client = new HttpClient())
         {
@@ -323,21 +292,119 @@ public partial class Facturas : System.Web.UI.Page
 
 
 
-    protected void Editar()
+    protected void Modificar(object sender, EventArgs e)
     {
+        string script = $"alert('${"d"}');";
+        ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+
         nuevaFacturaForm.Style["display"] = "block";
     }
 
-    protected void Command(object sender, GridViewCommandEventArgs e,DataGridItem d)
+    protected void Agregar(object sender, EventArgs e)
     {
-        if (e.CommandName.Equals("Editar"))
-        {
-            Editar();
-        }
-        else if (e.CommandName.Equals("Eliminar"))
-        {
-            Eliminar();
-        }
+        txtTitulo.InnerText = "Nueva Factura";
+        nuevaFacturaForm.Style["display"] = "block";
+        B_Modificar.Style["display"] = "none";
     }
 
+
+
+    protected void B_Añadir_Click(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(txtFecha.Text) ||
+            string.IsNullOrEmpty(ddlMoneda.SelectedValue) ||
+            string.IsNullOrEmpty(txtCIF.Text) ||
+            string.IsNullOrEmpty(txtNombre.Text) ||
+            string.IsNullOrEmpty(txtImporte.Text) ||
+            string.IsNullOrEmpty(txtImporteIVA.Text) ||
+            string.IsNullOrEmpty(txtFechaCobro.Text))
+        {
+            {
+                string script = $"alert('${txtFecha.Text }{ ddlMoneda.SelectedValue}{ (txtCIF.Text) }{  txtNombre.Text}{ decimal.Parse(txtImporte.Text) }{ txtImporteIVA.Text}{ txtFechaCobro.Text} ');";
+                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+            }
+        }
+        else { 
+            var factura = new JObject
+            {
+                { "fecha", DateTime.Parse(txtFecha.Text) },
+                { "cif", txtCIF.Text },
+                { "nombre", txtNombre.Text },
+                { "importe", decimal.Parse(txtImporte.Text) },
+                { "importe_iva", decimal.Parse(txtImporteIVA.Text) },
+                { "moneda", ddlMoneda.SelectedItem.Text },
+                { "fecha_cobro", DateTime.Parse(txtFecha.Text) },
+                { "estado", chkEstado.Checked }
+            };
+            Post(factura); 
+            nuevaFacturaForm.Style["display"] = "none";
+        }
+    }
+    protected void B_Modificar_Click(object sender, EventArgs e)
+    {
+        string script = $"alert('Error al eliminar la factura con ID {txtFecha.Text}');";
+        ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+        GridView1.EditIndex = -1;
+
+    }
+    protected async void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        await Delete(GridView1.Rows[e.RowIndex].Cells[0].Text);
+    }
+
+    protected void B_Cancelar_Click(object sender, EventArgs e)
+    {
+        nuevaFacturaForm.Style["display"] = "none";
+        txtFecha.Text = string.Empty;
+        txtCIF.Text = string.Empty;
+        txtNombre.Text = string.Empty;
+        txtImporte.Text = string.Empty;
+        txtImporteIVA.Text = string.Empty;
+        ddlMoneda.SelectedIndex = 0; 
+        txtFechaCobro.Text = string.Empty;
+        chkEstado.Checked = false;
+    }
+
+    protected  void Edit(int e)
+    {
+        txtTitulo.InnerText = "Modificar Factura";
+        nuevaFacturaForm.Style["display"] = "block";
+        B_Añadir.Style["display"] = "none";
+        B_Modificar.Style["display"] = "block";
+
+        //string script = $"alert('Error al eliminar la factura con ID {e.Row.RowIndex}');";
+        //ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+
+        txtFecha.Text = DateTime.Parse(GridView1.Rows[e].Cells[1].Text).ToString("yyyy-MM-ddTHH:mm");
+        txtCIF.Text = GridView1.Rows[e].Cells[2].Text;
+        txtNombre.Text = GridView1.Rows[e].Cells[3].Text;
+        txtImporte.Text = GridView1.Rows[e].Cells[4].Text;
+        txtImporteIVA.Text = GridView1.Rows[e].Cells[5].Text;
+        ddlMoneda.SelectedValue = GridView1.Rows[e].Cells[6].Text;
+        txtFechaCobro.Text = DateTime.Parse(GridView1.Rows[e].Cells[7].Text).ToString("yyyy-MM-ddTHH:mm");
+        chkEstado.Text = GridView1.Rows[e].Cells[8].Text;
+
+        GridView1.EditIndex = -1;
+        GridView1.SelectedIndex = -1;
+        
+    }
+
+    protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        if (e.CommandName == "Editar")
+        {
+            Edit(Convert.ToInt32(e.CommandArgument));
+        }else if (e.CommandName == "Eliminar")
+        {
+
+        }
+       
+    }
+
+
 }
+
+
+
+
+
