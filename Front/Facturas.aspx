@@ -192,10 +192,10 @@ button {
                 </div>
             </div>
 
-            <asp:Button ID="B_Agregar" runat="server" Text="Agregar" />
+            <asp:Button ID="B_Agregar" runat="server" Text="Agregar" OnClick="Agregar" />
 
 
-            <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" AutoGenerateColumns="false" DataKeyNames="id">
+            <asp:GridView ID="GridView1" runat="server" AlternatingRowStyle-BackColor="WhiteSmoke" AutoGenerateColumns="false" DataKeyNames="id" AutoGenerateEditButton="False" OnRowEditing="GridView1_RowEditing">
                 <Columns>
                     <asp:BoundField DataField="id" HeaderText="ID" SortExpression="id" />
                     <asp:BoundField DataField="fecha" HeaderText="Fecha" SortExpression="fecha" />
@@ -206,11 +206,7 @@ button {
                     <asp:BoundField DataField="moneda" HeaderText="Moneda" SortExpression="moneda" />
                     <asp:BoundField DataField="fecha_cobro" HeaderText="Fecha Cobro" SortExpression="fecha_cobro" />
                     <asp:BoundField DataField="estado" HeaderText="Estado" SortExpression="estado" />
-
-                    <asp:ButtonField runat="server" Text="Editar" CommandName="Editar" />
-                    <asp:ButtonField runat="server" Text="Eliminar" CommandName="Eliminar"/>
-
-
+                    <asp:CommandField ShowEditButton="True" ButtonType="Button" EditText="Editar" />
 
                 </Columns>
             </asp:GridView>

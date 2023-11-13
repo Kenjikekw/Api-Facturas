@@ -213,7 +213,7 @@ public partial class Facturas : System.Web.UI.Page
     * 
     * ORG 25/10/2023
     */
-    protected void Eliminar()
+    protected void Eliminar(object sender, EventArgs e)
     {
         if (GridView1.SelectedIndex >= 0)
         {
@@ -323,21 +323,24 @@ public partial class Facturas : System.Web.UI.Page
 
 
 
-    protected void Editar()
+    protected void Modificar(object sender, EventArgs e)
     {
+        string script = $"alert('${"d"}');";
+        ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+        
         nuevaFacturaForm.Style["display"] = "block";
     }
 
-    protected void Command(object sender, GridViewCommandEventArgs e,DataGridItem d)
+    protected void Agregar(object sender, EventArgs e)
     {
-        if (e.CommandName.Equals("Editar"))
-        {
-            Editar();
-        }
-        else if (e.CommandName.Equals("Eliminar"))
-        {
-            Eliminar();
-        }
+
+        nuevaFacturaForm.Style["display"] = "block";
     }
 
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        nuevaFacturaForm.Style["display"] = "block";
+        GridView1.EditIndex = -1;
+    }
 }
