@@ -12,11 +12,18 @@ using System.Web.UI.HtmlControls;
 
 public partial class Facturas : System.Web.UI.Page
 {
+
+    private int index;
     protected async void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
         {
             await Cargar();
+            f_moneda.Items.Add("Todos");
+            f_moneda.Items.Add("EUR");
+            f_estado.Items.Add("Todos");
+            f_estado.Items.Add("Pagada");
+            f_estado.Items.Add("No Pagada");
         }
     }
 
@@ -91,8 +98,8 @@ public partial class Facturas : System.Web.UI.Page
                     // Aplicar filtros
                     if ((string.IsNullOrEmpty(f_desde.Text) || fecha >= DateTime.Parse(f_desde.Text))
                         && (string.IsNullOrEmpty(f_hasta.Text) || fecha <= DateTime.Parse(f_hasta.Text))
-                        && (string.IsNullOrEmpty(f_moneda.SelectedValue) || moneda == f_moneda.SelectedValue)
-                        && (string.IsNullOrEmpty(f_estado.SelectedValue) || estadoFila == f_estado.SelectedValue)
+                        && (string.IsNullOrEmpty(f_moneda.SelectedValue) || f_moneda.SelectedValue == "Todos" || moneda == f_moneda.SelectedValue)
+                        && (string.IsNullOrEmpty(f_estado.SelectedValue) || f_estado.SelectedValue == "Todos" || estadoFila == f_estado.SelectedValue)
                         && (string.IsNullOrEmpty(f_importeMin.Text) || importe >= decimal.Parse(f_importeMin.Text))
                         && (string.IsNullOrEmpty(f_importeMax.Text) || importe <= decimal.Parse(f_importeMax.Text)))
                     {
@@ -205,23 +212,29 @@ public partial class Facturas : System.Web.UI.Page
     /* Pre: Hace una peticion a la api de tipo get con el dato introducido en el textbox
     * Pro: Lo hace
     * 
-    * ORG 25/10/2023
- 
+    * ORG 25/10/2023*/
+
+    protected void Cancelar(object sender, EventArgs e)
+    {
+        confirmationPanel.Style["display"] = "none";
+    }
+
+
+
 
     /* Pre: Hace una peticion a la api de tipo delete con el dato introducido en el textbox
     * Pro: Lo hace
     * 
     * ORG 25/10/2023
     */
-    protected void Eliminar(object sender, EventArgs e)
+    protected async void Eliminar(object sender, EventArgs e)
     {
-        if (GridView1.SelectedIndex >= 0)
+        if (index >= 0)
         {
-            int rowIndex = GridView1.SelectedIndex;
-            string idToDelete = GridView1.DataKeys[rowIndex]["id"].ToString();
+            string idToDelete = GridView1.Rows[index].Cells[0].Text;
 
-            ViewState["IDToDelete"] = idToDelete;
-            confirmationPanel.Style["display"] = "block";
+            await Delete(idToDelete);
+            confirmationPanel.Style["display"] = "none";
         }
     }
 
@@ -262,7 +275,7 @@ public partial class Facturas : System.Web.UI.Page
     * 
     * ORG 25/10/2023
     */
-    protected async void Put(JObject factura)
+    protected async Task Put(JObject factura)
     {
 
         var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(factura);
@@ -320,7 +333,7 @@ public partial class Facturas : System.Web.UI.Page
             string.IsNullOrEmpty(txtFechaCobro.Text))
         {
             {
-                string script = $"alert('${txtFecha.Text }{ ddlMoneda.SelectedValue}{ (txtCIF.Text) }{  txtNombre.Text}{ decimal.Parse(txtImporte.Text) }{ txtImporteIVA.Text}{ txtFechaCobro.Text} ');";
+                string script = $"alert('Debes rellenar todos los campos antes de añadir una factura');";
                 ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
             }
         }
@@ -340,16 +353,39 @@ public partial class Facturas : System.Web.UI.Page
             nuevaFacturaForm.Style["display"] = "none";
         }
     }
-    protected void B_Modificar_Click(object sender, EventArgs e)
+    protected async void B_Modificar_Click(object sender, EventArgs e)
     {
-        string script = $"alert('Error al eliminar la factura con ID {txtFecha.Text}');";
-        ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-        GridView1.EditIndex = -1;
+        if (string.IsNullOrEmpty(txtFecha.Text) ||
+            string.IsNullOrEmpty(ddlMoneda.SelectedValue) ||
+            string.IsNullOrEmpty(txtCIF.Text) ||
+            string.IsNullOrEmpty(txtNombre.Text) ||
+            string.IsNullOrEmpty(txtImporte.Text) ||
+            string.IsNullOrEmpty(txtImporteIVA.Text) ||
+            string.IsNullOrEmpty(txtFechaCobro.Text))
+        {
+            {
+                string script = $"alert('Debes rellenar todos los campos antes de modificar la factura');";
+                ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
+            }
+        }
+        else
+        {
+            var factura = new JObject
+            {
+                {"id", Int32.Parse(GridView1.Rows[index].Cells[0].Text)},
+                { "fecha", DateTime.Parse(txtFecha.Text) },
+                { "cif", txtCIF.Text },
+                { "nombre", txtNombre.Text },
+                { "importe", decimal.Parse(txtImporte.Text) },
+                { "importe_iva", decimal.Parse(txtImporteIVA.Text) },
+                { "moneda", ddlMoneda.SelectedItem.Text },
+                { "fecha_cobro", DateTime.Parse(txtFecha.Text) },
+                { "estado", chkEstado.Checked }
+            };
+            await Put(factura);
+            nuevaFacturaForm.Style["display"] = "none";
+        }
 
-    }
-    protected async void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
-    {
-        await Delete(GridView1.Rows[e.RowIndex].Cells[0].Text);
     }
 
     protected void B_Cancelar_Click(object sender, EventArgs e)
@@ -372,9 +408,6 @@ public partial class Facturas : System.Web.UI.Page
         B_Añadir.Style["display"] = "none";
         B_Modificar.Style["display"] = "block";
 
-        //string script = $"alert('Error al eliminar la factura con ID {e.Row.RowIndex}');";
-        //ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-
         txtFecha.Text = DateTime.Parse(GridView1.Rows[e].Cells[1].Text).ToString("yyyy-MM-ddTHH:mm");
         txtCIF.Text = GridView1.Rows[e].Cells[2].Text;
         txtNombre.Text = GridView1.Rows[e].Cells[3].Text;
@@ -391,12 +424,16 @@ public partial class Facturas : System.Web.UI.Page
 
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
+
+        index = Convert.ToInt32(e.CommandArgument);
+
         if (e.CommandName == "Editar")
         {
             Edit(Convert.ToInt32(e.CommandArgument));
         }else if (e.CommandName == "Eliminar")
         {
-
+            p_text.InnerText = "¿Estás seguro de que deseas eliminar la factura con id "+ GridView1.Rows[index].Cells[0].Text+"?";
+            confirmationPanel.Style["display"] = "block";
         }
        
     }
