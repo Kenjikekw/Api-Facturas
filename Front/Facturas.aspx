@@ -7,155 +7,208 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Facturas</title>
-<style>
-    body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
-    padding: 0;
-}
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
 
-form {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+        form {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-}
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-}
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
 
-table, th, td {
-    border: 1px solid #ccc;
-}
+        table, th, td {
+            border: 1px solid #ccc;
+        }
 
-th, td {
-    padding: 10px;
-    text-align: left;
-}
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
 
-th {
-    background-color: #4CAF50;
-    color: #fff;
-}
+        th {
+            background-color: #4CAF50;
+            color: #fff;
+        }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
-input[type="text"],
-input[type="date"],
-input[type="number"],
-select,
-button {
-    width: calc(100% - 20px);
-    padding: 10px;
-    font-size: 16px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-}
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
 
-button {
-    background-color: #2196F3;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
+        button {
+            background-color: #2196F3;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
 
-    button:hover {
-        background-color: #0b7dda;
-    }
+            button:hover {
+                background-color: #0b7dda;
+            }
 
-#overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-}
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
 
-#popup {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(9, 9, 9, 0.524);
-    position: relative;
-}
+        #popup {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(9, 9, 9, 0.524);
+            position: relative;
+        }
 
-#confirmationPanel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.8); 
-    padding: 20px;
-    z-index: 1001;
-}
+        #confirmationPanel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            z-index: 1001;
+        }
 
-    .confirmation-panel button {
-        margin: 0 10px;
-        padding: 10px;
-        cursor: pointer;
-    }
+        .confirmation-panel button {
+            margin: 0 10px;
+            padding: 10px;
+            cursor: pointer;
+        }
 
-    .confirmation-panel #btnConfirmarEliminar {
-        background-color: #2196F3;
-        color: #fff;
-    }
+        .confirmation-panel #btnConfirmarEliminar {
+            background-color: #2196F3;
+            color: #fff;
+        }
 
-    .confirmation-panel #btnCancelarEliminar {
-        background-color: #ccc;
-        color: #333;
-    }
+        .confirmation-panel #btnCancelarEliminar {
+            background-color: #ccc;
+            color: #333;
+        }
 
-    .titulo{
+        .titulo {
+        }
 
-    }
+        .filtros {
+            display: flex;
+            justify-content: space-around;
+        }
 
-    .filtros {
-        display: flex;
-        justify-content: space-around;
-    }
+            .filtros div {
+            }
 
-    .filtros div{
+        #nuevaFacturaForm {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(9, 9, 9, 0.524);
+            z-index: 2; /* Asegúrate de que el pop-up tenga un índice z mayor que el contenido principal */
+            max-width: 400px; /* Ajusta el ancho máximo según tus necesidades */
+            width: 100%;
+        }
 
-    }
+            #nuevaFacturaForm h2 {
+                margin-bottom: 20px;
+                color: #333; /* Ajusta el color del texto según tus preferencias */
+            }
 
-    #nuevaFacturaForm{
-        display: none;    }
+            #nuevaFacturaForm div {
+                margin-bottom: 15px;
+            }
 
-    #B_Agregar{
-        display: flex;
-    margin-left: auto;
-    }
-</style>
+            #nuevaFacturaForm label {
+                display: block;
+                margin-bottom: 5px;
+                color: #555; /* Ajusta el color del texto según tus preferencias */
+            }
+
+            #nuevaFacturaForm input[type="text"],
+            #nuevaFacturaForm input[type="date"],
+            #nuevaFacturaForm input[type="number"],
+            #nuevaFacturaForm select {
+                width: calc(100% - 20px);
+                padding: 10px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+            }
+
+            #nuevaFacturaForm button {
+                width: calc(100% - 20px);
+                padding: 10px;
+                font-size: 16px;
+                background-color: #2196F3;
+                color: #fff;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+
+                #nuevaFacturaForm button:hover {
+                    background-color: #0b7dda;
+                }
+
+        #B_Agregar {
+            display: flex;
+            margin-left: auto;
+        }
+    </style>
 
 
 </head>
@@ -163,7 +216,7 @@ button {
     <form id="form1" runat="server">
         <div>
             <h2 class="titulo">Facturas</h2>
-            
+
 
             <div class="filtros">
                 <div>
@@ -208,7 +261,7 @@ button {
                     <asp:BoundField DataField="estado" HeaderText="Estado" SortExpression="estado" />
 
                     <asp:ButtonField runat="server" Text="Editar" CommandName="Editar" />
-                    <asp:ButtonField runat="server" Text="Eliminar" CommandName="Eliminar"/>
+                    <asp:ButtonField runat="server" Text="Eliminar" CommandName="Eliminar" />
 
 
 
