@@ -315,6 +315,14 @@ public partial class Facturas : System.Web.UI.Page
 
     protected void Agregar(object sender, EventArgs e)
     {
+        txtFecha.Text = string.Empty;
+        txtCIF.Text = string.Empty;
+        txtNombre.Text = string.Empty;
+        txtImporte.Text = string.Empty;
+        txtImporteIVA.Text = string.Empty;
+        ddlMoneda.SelectedIndex = 0;
+        txtFechaCobro.Text = string.Empty;
+        chkEstado.Checked = false;
         txtTitulo.InnerText = "Nueva Factura";
         nuevaFacturaForm.Style["display"] = "block";
         B_Modificar.Style["display"] = "none";
