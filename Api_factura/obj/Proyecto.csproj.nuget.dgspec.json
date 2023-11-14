@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Usuario\\Desktop\\Proyecto\\Proyecto.csproj": {}
+    "C:\\Users\\Usuario\\Documents\\Facturas\\Api_factura\\Proyecto.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Usuario\\Desktop\\Proyecto\\Proyecto.csproj": {
+    "C:\\Users\\Usuario\\Documents\\Facturas\\Api_factura\\Proyecto.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Usuario\\Desktop\\Proyecto\\Proyecto.csproj",
+        "projectUniqueName": "C:\\Users\\Usuario\\Documents\\Facturas\\Api_factura\\Proyecto.csproj",
         "projectName": "Proyecto",
-        "projectPath": "C:\\Users\\Usuario\\Desktop\\Proyecto\\Proyecto.csproj",
+        "projectPath": "C:\\Users\\Usuario\\Documents\\Facturas\\Api_factura\\Proyecto.csproj",
         "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Usuario\\Desktop\\Proyecto\\obj\\",
+        "outputPath": "C:\\Users\\Usuario\\Documents\\Facturas\\Api_factura\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Usuario\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -82,7 +82,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6JFS1EaSPTxe0MfgpEB39n2tuHys+HzkYKngSE7wHK2t/OQoigsy+UNiCN68XLzUHHxffrJUzf+9IWA0dvNS4Q==",
+  "dgSpecHash": "C2NtW11hveHn58SITAkwka8TApAARYtul6KGIIlJmnLXdU5n8TVyys+Fden5AWuA2pLlCa9OPFgMLoZhNeqHRw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Usuario\\Desktop\\Proyecto\\Proyecto.csproj",
+  "projectFilePath": "C:\\Users\\Usuario\\Documents\\Facturas\\Api_factura\\Proyecto.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Usuario\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Usuario\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
