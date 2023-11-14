@@ -409,7 +409,7 @@ public partial class Facturas : System.Web.UI.Page
         txtImporteIVA.Text = GridView1.Rows[e].Cells[5].Text;
         ddlMoneda.SelectedValue = GridView1.Rows[e].Cells[6].Text;
         txtFechaCobro.Text = DateTime.Parse(GridView1.Rows[e].Cells[7].Text).ToString("yyyy-MM-ddTHH:mm");
-        chkEstado.Text = GridView1.Rows[e].Cells[8].Text;
+        chkEstado.Checked = false;
 
         GridView1.EditIndex = -1;
         GridView1.SelectedIndex = -1;
@@ -423,18 +423,25 @@ public partial class Facturas : System.Web.UI.Page
 	 */
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
-
-        index = Convert.ToInt32(e.CommandArgument);
-
-        if (e.CommandName == "Editar")
+        if (GridView1.Rows[Convert.ToInt32(e.CommandArgument)].Cells[8].Text.Equals("Pagada"))
         {
-            Edit(Convert.ToInt32(e.CommandArgument));
-        }else if (e.CommandName == "Eliminar")
-        {
-            p_text.InnerText = "¿Estás seguro de que deseas eliminar la factura con id "+ GridView1.Rows[index].Cells[0].Text+"?";
-            confirmationPanel.Style["display"] = "block";
+            string script = $"alert('No puedes modificar una factura ya pagada');";
+            ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
         }
-       
+        else
+        {
+            index = Convert.ToInt32(e.CommandArgument);
+
+            if (e.CommandName == "Editar")
+            {
+                Edit(Convert.ToInt32(e.CommandArgument));
+            }
+            else if (e.CommandName == "Eliminar")
+            {
+                p_text.InnerText = "¿Estás seguro de que deseas eliminar la factura con id " + GridView1.Rows[index].Cells[0].Text + "?";
+                confirmationPanel.Style["display"] = "block";
+            }
+        }
     }
 
 

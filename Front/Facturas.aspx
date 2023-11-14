@@ -394,7 +394,7 @@
                     </div>
                     <div class="form-group">
                         <h4 for="chkEstado">Estado:</h4>
-                        <asp:CheckBox ID="chkEstado" runat="server" />
+                        <asp:CheckBox ID="chkEstado" runat="server" Text="" />
                     </div>
                 </div>
 
