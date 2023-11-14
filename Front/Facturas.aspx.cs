@@ -14,35 +14,65 @@ public partial class Facturas : System.Web.UI.Page
 {
 
     private int index;
+    private DataTable tabla_C;
     protected async void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
         {
-            await Cargar();
+               await Cargar();
+
+            HashSet<string> lista_M = new HashSet<string>();
+            HashSet<string> lista_E= new HashSet<string>();
+
+            foreach (DataRow row in tabla_C.Rows)
+            {
+                string valor = row["moneda"].ToString();
+                string estado = row["estado"].ToString();
+                lista_M.Add(valor);
+                lista_E.Add(estado);
+            }
+
             f_moneda.Items.Add("Todos");
-            f_moneda.Items.Add("EUR");
             f_estado.Items.Add("Todos");
-            f_estado.Items.Add("Pagada");
-            f_estado.Items.Add("No Pagada");
+
+            foreach (string valor in lista_M)
+            {
+                f_moneda.Items.Add(valor);
+                ddlMoneda.Items.Add(valor);
+            }
+
+            foreach (string valor in lista_E)
+            {
+                f_estado.Items.Add(valor);
+            }
         }
     }
 
+    /* Pre: Llama a la carga de datos
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
     protected async void Cargar(object sender, EventArgs e)
     {
         await Cargar();
     }
 
-
+    /* Pre: Llama al metodo listar y rellena el gridview con los datos de la tabla
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
     protected async Task Cargar()
     {
         GridView1.DataSource = await Listar();
         GridView1.DataBind();
     }
 
-    /* Pre: Carga datos tabla
+    /* Pre: Hace una llamada a la api y te devuelve una tabla que luego es filtrada
 	 * Pro: Lo hace
 	 * 
-	 * ORG 25/10/2023
+	 * ORG 13/11/2023
 	 */
 
     public async Task<DataTable> Listar()
@@ -87,13 +117,14 @@ public partial class Facturas : System.Web.UI.Page
                 }
 
                 //Aplicamos los filtros y mierdas
+                tabla_C = dataTable;
                 DataTable dataTableFiltrada = dataTable.Clone();
                 foreach (DataRow fila in dataTable.Rows)
                 {
-                    DateTime fecha = DateTime.Parse(fila["fecha"].ToString()); // Ajusta "Fecha" al nombre real de la columna
-                    string moneda = fila["moneda"].ToString(); // Ajusta "TipoMoneda" al nombre real de la columna
-                    string estadoFila = fila["Estado"].ToString(); // Ajusta "Estado" al nombre real de la columna
-                    decimal importe = decimal.Parse(fila["Importe"].ToString()); // Ajusta "Importe" al nombre real de la columna
+                    DateTime fecha = DateTime.Parse(fila["fecha"].ToString()); 
+                    string moneda = fila["moneda"].ToString(); 
+                    string estadoFila = fila["Estado"].ToString(); 
+                    decimal importe = decimal.Parse(fila["Importe"].ToString()); 
 
                     // Aplicar filtros
                     if ((string.IsNullOrEmpty(f_desde.Text) || fecha >= DateTime.Parse(f_desde.Text))
@@ -114,76 +145,15 @@ public partial class Facturas : System.Web.UI.Page
 
         return new DataTable();
     }
-
-    /* Pre: Comprueba si hay algun textbox vacio y en funcion de si hay alguno vacio te lo bloque los botones correspondientes
-	 * Pro: Lo hace
-	 * 
-	 * ORG 25/10/2023
-	 */
-    protected void Vacio(object sender, EventArgs e)
-    {
-        bool enableButton = true;
-        B_Agregar.Enabled = enableButton;
-
-
-        if (string.IsNullOrEmpty(txtFecha.Text) ||
-            string.IsNullOrEmpty(ddlMoneda.SelectedValue) ||
-            string.IsNullOrEmpty(txtCIF.Text) ||
-            string.IsNullOrEmpty(txtNombre.Text) ||
-            string.IsNullOrEmpty(txtImporte.Text) ||
-            string.IsNullOrEmpty(txtImporteIVA.Text) ||
-            string.IsNullOrEmpty(txtFechaCobro.Text))
-        {
-            B_Agregar.Enabled = false;
-            throw new Exception("Rellena todos los datos");
-        }
-        else
-        {
-            B_Agregar.Enabled = true;
-        }
-
-
-    }
-    /* Pre: Bloquea boton agregar si hay datos
-    * Pro: Lo hace
-    * 
-    * ORG 25/10/2023
-    
-   
-    protected void AplicarFiltros(object sender, EventArgs e)
-    {
-        DataView dataView = new DataView(datatable);
-
-        string filtroMoneda = FiltroMoneda.SelectedValue;
-        string filtroMetodoEnvio = FiltroEnvio.SelectedValue;
-
-        if (filtroMoneda != "Todos" && filtroMetodoEnvio != "Todos")
-        {
-            dataView.RowFilter = $"Moneda = '{filtroMoneda}' AND MetodoEnvio = '{filtroMetodoEnvio}'";
-        }
-        else if (filtroMoneda != "Todos")
-        {
-            dataView.RowFilter = $"Moneda = '{filtroMoneda}'";
-        }
-        else if (filtroMetodoEnvio != "Todos")
-        {
-            dataView.RowFilter = $"MetodoEnvio = '{filtroMetodoEnvio}'";
-        }
-        Session["Filtro"] = dataView;
-
-        GridView1.DataSource = dataView;
-        GridView1.DataBind();
-    }
-
+ 
 
     /* Pre: Hace una peticion a la api de tipo post con los datos introducidos en los textbox
 	 * Pro: Lo hace
 	 * 
-	 * ORG 25/10/2023
+	 * ORG 13/11/2023
 	 */
     protected async void Post(JObject factura)
     {
-        
 
         var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(factura);
 
@@ -209,10 +179,10 @@ public partial class Facturas : System.Web.UI.Page
             }
         }
     }
-    /* Pre: Hace una peticion a la api de tipo get con el dato introducido en el textbox
+    /* Pre: Oculta la tarjeta
     * Pro: Lo hace
     * 
-    * ORG 25/10/2023*/
+    * ORG 13/11/2023*/
 
     protected void Cancelar(object sender, EventArgs e)
     {
@@ -222,10 +192,10 @@ public partial class Facturas : System.Web.UI.Page
 
 
 
-    /* Pre: Hace una peticion a la api de tipo delete con el dato introducido en el textbox
+    /* Pre: Llama a delete y oculta la tarjeta
     * Pro: Lo hace
     * 
-    * ORG 25/10/2023
+    * ORG 13/11/2023
     */
     protected async void Eliminar(object sender, EventArgs e)
     {
@@ -239,9 +209,11 @@ public partial class Facturas : System.Web.UI.Page
     }
 
 
- 
-
-
+       /* Pre:Hace una peticion a la api de tipo delete
+        * Pro: Lo hace
+        * 
+        * ORG 13/11/2023
+        */
     protected async Task Delete(string idToDelete)
     {
         using (HttpClient client = new HttpClient())
@@ -273,7 +245,7 @@ public partial class Facturas : System.Web.UI.Page
     /* Pre: Hace una peticion a la api de tipo put con los datos introducidos en los textbox
     * Pro: Lo hace
     * 
-    * ORG 25/10/2023
+    * ORG 13/11/2023
     */
     protected async Task Put(JObject factura)
     {
@@ -303,16 +275,11 @@ public partial class Facturas : System.Web.UI.Page
         }
     }
 
-
-
-    protected void Modificar(object sender, EventArgs e)
-    {
-        string script = $"alert('${"d"}');";
-        ClientScript.RegisterStartupScript(this.GetType(), "AlertScript", script, true);
-
-        nuevaFacturaForm.Style["display"] = "block";
-    }
-
+    /* Pre: Limpia los campos de la tarjeta y muestra los botones necesarios
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
     protected void Agregar(object sender, EventArgs e)
     {
         txtFecha.Text = string.Empty;
@@ -324,12 +291,15 @@ public partial class Facturas : System.Web.UI.Page
         txtFechaCobro.Text = string.Empty;
         chkEstado.Checked = false;
         txtTitulo.InnerText = "Nueva Factura";
+        B_Añadir.Style["display"] = "block";
         nuevaFacturaForm.Style["display"] = "block";
         B_Modificar.Style["display"] = "none";
     }
-
-
-
+    /* Pre: Comprueba si todos los campos estan rellenos y en caso de que si, llama al metodo post
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
     protected void B_Añadir_Click(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(txtFecha.Text) ||
@@ -361,6 +331,12 @@ public partial class Facturas : System.Web.UI.Page
             nuevaFacturaForm.Style["display"] = "none";
         }
     }
+
+    /* Pre: Comprueba que todos los datos estan rellenos y llama al metodo Put
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
     protected async void B_Modificar_Click(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(txtFecha.Text) ||
@@ -396,6 +372,11 @@ public partial class Facturas : System.Web.UI.Page
 
     }
 
+    /* Pre: Limpia los campos y oculta la tarjeta
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
     protected void B_Cancelar_Click(object sender, EventArgs e)
     {
         nuevaFacturaForm.Style["display"] = "none";
@@ -409,7 +390,12 @@ public partial class Facturas : System.Web.UI.Page
         chkEstado.Checked = false;
     }
 
-    protected  void Edit(int e)
+    /* Pre: Asigna a los textbox los valores de la fila seleccionada
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
+    protected void Edit(int e)
     {
         txtTitulo.InnerText = "Modificar Factura";
         nuevaFacturaForm.Style["display"] = "block";
@@ -430,6 +416,11 @@ public partial class Facturas : System.Web.UI.Page
         
     }
 
+    /* Pre: En funcion de si eliges un boton u otro te hace un metodo u otro
+	 * Pro: Lo hace
+	 * 
+	 * ORG 13/11/2023
+	 */
     protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
     {
 

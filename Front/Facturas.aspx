@@ -16,7 +16,6 @@
         }
 
         form {
-            min-width: 1500px;
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
@@ -77,7 +76,6 @@
         input[type="number"],
         select,
         button {
-            width: calc(100% - 20px);
             padding: 10px;
             font-size: 16px;
             margin-bottom: 10px;
@@ -381,9 +379,7 @@
                     </div>
                     <div class="form-group">
                         <h4 for="ddlMoneda">Moneda:</h4>
-                        <asp:DropDownList ID="ddlMoneda" runat="server">
-                            <asp:ListItem Text="EUR"></asp:ListItem>
-                        </asp:DropDownList>
+                        <asp:DropDownList ID="ddlMoneda" runat="server" />
                     </div>
                 </div>
 
